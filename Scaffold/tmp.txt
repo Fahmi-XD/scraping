@@ -1,0 +1,9 @@
+🎁 AI Mirror
+
+Image to Image
+
+* 💻 Base : https://play.google.com/store/apps/details?id=com.ai.polyverse.mirror
+* 👨‍💻 Author : Fahmi
+* 📩 Request By : Gktawu
+* ☕ Code : https://github.com/Fahmi-XD/scraping/blob/main/Complete/AIMirror/index.js
+* 🔑 Model id : https://github.com/Fahmi-XD/scraping/blob/main/Complete/AIMirror/model.json
