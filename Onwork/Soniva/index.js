@@ -207,6 +207,9 @@ class Soniva {
         const targetUserId = options.userId || this.userId;
         if (!targetUserId) {
             await this.reg();
+            await new Promise((resolve) => setTimeout(() => {
+              resolve()
+            }, 5_000))
         } else {
             if (options.userId) {
                 this.userId = options.userId;
@@ -225,16 +228,18 @@ class Soniva {
 
         const body = {
             device_id: headers["x-device-id"],
-            push_token: headers["x-signature-id"],
+            push_token: "c1297x4TQVKCGjRvVoU-SN:APA91bGvoTvXHV9zGnfC4Y7QMGA4pRgDuRYVB53LV4ntz2gZB55tsUt2Q7AGS098vhi4QStxOdu3cW4QW6Vau6gNLEtTwQFvE1sShbARu4g9mGowYmJC89I",
             message_id: headers["x-message-id"],
-            AuthToken: headers["x-signature-id"]
+            // AuthToken: headers["x-signature-id"]
         };
 
         try {
             const response = await axios.post(`${Func.BASE_URL}/v1/register`, body, {
                 headers: headers,
+                body,
                 validateStatus: (status) => status < 500
             });
+            Func.logMessage("Register", JSON.stringify(response.data));
             this.userId = response.data.user_id;
             Func.logMessage("Soniva", `✅ Registered! User ID: ${this.userId}`);
             return response.data;
@@ -739,7 +744,7 @@ async function mainApiHandler({
         has_vocal: true,
         vocal_gender: "female",
         record_type: "live",
-        lyrics: "A futuristic cyberpunk track with heavy bass, neon-lit synth melodies, and a sense of urgent pursuit.",
+        prompt: "A futuristic cyberpunk track with heavy bass, neon-lit synth melodies, and a sense of urgent pursuit.",
         is_dual_song_enabled: true,
 
         // Contoh untuk action: 'reg' ini untuk register
