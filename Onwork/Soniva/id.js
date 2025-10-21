@@ -17,7 +17,7 @@ function generateDeviceId(packageName, androidId) {
 // Namespace bisa apa saja, tapi SDK-nya mungkin pakai konstan tertentu.
 // Misalnya "android_id" atau "device".
 // Contoh sederhana:
-const namespace = uuidv3.DNS; // pakai namespace default bawaan
+const namespace = uuidv3.URL; // pakai namespace default bawaan
 const androidId = "32d0c9bd5c7aa570"; // biasanya dari Settings.Secure.ANDROID_ID
 const deviceId = uuidv3(androidId, namespace);
 

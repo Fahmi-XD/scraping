@@ -30,7 +30,9 @@ class Func {
     static DECRYPTION_PARAM_2 = Uint8Array.from([94, 81, 94, 10, 92, 28, 71, 87, 78, 2, 9, 10, 72, 14, 92, 27, 92, 14, 4, 15]);
     static ENCRYPTED_KEY_BYTES = this.JAVA_BYTE_KEY.map((val) => val < 0 ? 256 + val : val);
     static CHARSET = 'utf-8'
-    static DEVICE_ID = uuidv4();
+    // static DEVICE_ID = "944b5183-6124-3887-90af-d939cf3cfa87";
+    static DEVICE_ID = "cf95dc53-f383-39a8-b6fd-749f3ef439cd";
+    // static DEVICE_ID = uuidv4();
     static isLogEnabled = false
 
     /**
@@ -167,20 +169,22 @@ class Func {
             const requestTime = String(Date.now());
 
             const xSignatureID = this.generateHmacSha256Signature(deviceId, messageId, requestTime)
+            const xRequestID = this.generateHmacSha256Signature(deviceId, requestTime, messageId)
             this.logMessage("x-signature-id", xSignatureID)
+            this.logMessage("x-request-id", xRequestID)
 
             const headers = {
                 "x-signature-id": xSignatureID,
+                "x-request-id": xRequestID,
                 "x-device-id": deviceId,
                 "x-request-time": requestTime,
                 "x-message-id": messageId,
                 "platform": "android",
-                "x-app-version": "1.2.6",
-                "x-country": "US",
-                "accept-language": "en-US",
-                "user-agent": "SonivaMusic/1.2.6 (build:70; Android 10; Xiaomi Redmi Note 5)",
-                "content-type": "application/json; charset=utf-8",
-                "accept-encoding": "gzip",
+                "x-app-version": "1.3.6",
+                "x-country": "ID",
+                "accept-language": "id-ID",
+                "user-agent": "SonivaMusic/1.3.6 (build:87; Android 13; Vivo V2038)",
+                "content-type": "application/json",
                 "host": "api.sonivamusic.com",
             }
 
@@ -189,7 +193,6 @@ class Func {
             return headers;
         } catch (error) {
             console.error("Error generating API headers:", error)
-            throw error;
         }
     }
 }
@@ -207,9 +210,9 @@ class Soniva {
         const targetUserId = options.userId || this.userId;
         if (!targetUserId) {
             await this.reg();
-            await new Promise((resolve) => setTimeout(() => {
-              resolve()
-            }, 5_000))
+            // await new Promise((resolve) => setTimeout(() => {
+            //     resolve()
+            // }, 5_000))
         } else {
             if (options.userId) {
                 this.userId = options.userId;
@@ -228,16 +231,17 @@ class Soniva {
 
         const body = {
             device_id: headers["x-device-id"],
-            push_token: "c1297x4TQVKCGjRvVoU-SN:APA91bGvoTvXHV9zGnfC4Y7QMGA4pRgDuRYVB53LV4ntz2gZB55tsUt2Q7AGS098vhi4QStxOdu3cW4QW6Vau6gNLEtTwQFvE1sShbARu4g9mGowYmJC89I",
+            push_token: headers["x-signature-id"],
             message_id: headers["x-message-id"],
-            // AuthToken: headers["x-signature-id"]
+            AuthToken: headers["x-request-id"]
         };
+
+        Func.logMessage("Register", JSON.stringify(body))
 
         try {
             const response = await axios.post(`${Func.BASE_URL}/v1/register`, body, {
                 headers: headers,
-                body,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Register", JSON.stringify(response.data));
             this.userId = response.data.user_id;
@@ -245,7 +249,6 @@ class Soniva {
             return response.data;
         } catch (error) {
             console.error("❌ Registration failed:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -280,7 +283,7 @@ class Soniva {
         try {
             const response = await axios.post(`${Func.BASE_URL}/v1/users/${this.userId}/songs/lyrics`, body, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ Song generation from lyrics started!");
             return {
@@ -289,7 +292,6 @@ class Soniva {
             };
         } catch (error) {
             console.error("❌ Generation from lyrics failed:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -323,7 +325,7 @@ class Soniva {
         try {
             const response = await axios.post(`${Func.BASE_URL}/v1/users/${this.userId}/songs/prompt`, body, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ Song generation from prompt started!");
             return {
@@ -332,7 +334,6 @@ class Soniva {
             };
         } catch (error) {
             console.error("❌ Generation from prompt failed:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -348,13 +349,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/songs/${jobId}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Song status fetched for jobId: ${jobId}`);
             return response.data;
         } catch (error) {
             console.error("❌ Failed to fetch song status:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -380,13 +380,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/users/${targetUserId}/library?page=${page}&limit=${limit}&sortAsc=${sortAsc}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Found ${response.data.songs?.length || 0} songs`);
             return response.data;
         } catch (error) {
             console.error("❌ List fetch failed:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -399,13 +398,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/explore/recent?page=${page}&limit=${limit}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Fetched ${response.data.songs?.length || 0} recent explore songs`);
             return response.data;
         } catch (error) {
             console.error("❌ Failed to fetch recent explore songs:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -419,13 +417,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/explore/trending?page=${page}&limit=${limit}&range=${range}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Fetched ${response.data.songs?.length || 0} trending explore songs`);
             return response.data;
         } catch (error) {
             console.error("❌ Failed to fetch trending explore songs:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -439,13 +436,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/explore/popular?page=${page}&limit=${limit}&range=${range}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Fetched ${response.data.songs?.length || 0} popular explore songs`);
             return response.data;
         } catch (error) {
             console.error("❌ Failed to fetch popular explore songs:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -458,13 +454,12 @@ class Soniva {
         try {
             const response = await axios.patch(`${Func.BASE_URL}/v1/register`, body, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ FCM token updated successfully!");
             return response.data;
         } catch (error) {
             console.error("❌ Failed to update FCM token:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -477,13 +472,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/users/${userId}/info`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ User info fetched!");
             return response.data;
         } catch (error) {
             console.error("❌ Failed to get user info:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -500,13 +494,12 @@ class Soniva {
         try {
             const response = await axios.patch(`${Func.BASE_URL}/v1/users/${userId}/songs/title`, body, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ Song title updated successfully!");
             return response.data;
         } catch (error) {
             console.error("❌ Failed to update song title:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -522,14 +515,13 @@ class Soniva {
         try {
             const response = await axios.delete(`${Func.BASE_URL}/v1/users/${userId}/library`, {
                 headers: headers,
-                validateStatus: (status) => status < 500,
+                validateStatus: (status) => status < 700,
                 data: body
             });
             Func.logMessage("Soniva", "✅ Songs deleted successfully!");
             return response.data;
         } catch (error) {
             console.error("❌ Failed to delete songs:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -545,13 +537,12 @@ class Soniva {
         try {
             const response = await axios.post(`${Func.BASE_URL}/v1/users/${userId}/songs/${songId}/separate`, body, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", "✅ Song separation initiated!");
             return response.data;
         } catch (error) {
             console.error("❌ Failed to initiate song separation:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -561,13 +552,12 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.BASE_URL}/v1/songs/separate/${jobId}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500
+                validateStatus: (status) => status < 700
             });
             Func.logMessage("Soniva", `✅ Separation status for jobId ${jobId}: ${response.data.status}`);
             return response.data;
         } catch (error) {
             console.error("❌ Failed to get separation status:", error.response?.status, error.response?.data);
-            throw error;
         }
     }
 
@@ -585,14 +575,13 @@ class Soniva {
         try {
             const response = await axios.get(`${Func.DOWNLOAD_BASE_URL}/song/${songPath}`, {
                 headers: headers,
-                validateStatus: (status) => status < 500,
+                validateStatus: (status) => status < 700,
                 responseType: "arraybuffer"
             });
             Func.logMessage("Soniva", `✅ Downloaded ${(response.data.byteLength / 1024 / 1024).toFixed(2)} MB`);
             return response.data;
         } catch (error) {
             console.error("❌ Download failed:", error.response?.status);
-            throw error;
         }
     }
 }
