@@ -30,8 +30,8 @@ class Func {
     static DECRYPTION_PARAM_2 = Uint8Array.from([94, 81, 94, 10, 92, 28, 71, 87, 78, 2, 9, 10, 72, 14, 92, 27, 92, 14, 4, 15]);
     static ENCRYPTED_KEY_BYTES = this.JAVA_BYTE_KEY.map((val) => val < 0 ? 256 + val : val);
     static CHARSET = 'utf-8'
-    // static DEVICE_ID = "944b5183-6124-3887-90af-d939cf3cfa87";
-    static DEVICE_ID = "cf95dc53-f383-39a8-b6fd-749f3ef439cd";
+    static DEVICE_ID = "944b5183-6124-3887-90af-d939cf3cfa87";
+    // static DEVICE_ID = "938a46e3-040a-3a2b-9a79-db96bf5fb4a9";
     // static DEVICE_ID = uuidv4();
     static isLogEnabled = false
 
@@ -720,12 +720,14 @@ async function mainApiHandler({
 }
 
 /**
+ * 4983a103-313d-4005-8200-9f7f4dec65b5
+ * 
  * Contoh
  */
 (async () => {
     const config = {
         action: "gen", // Ubah ke 'status', 'list', 'dl', dll untuk menjalankan fitur lain
-        userId: "", // Taruh user_id disini, jika ingin membuat userId baru, kosongkan saja => ''
+        userId: "4983a103-313d-4005-8200-9f7f4dec65b5", // Taruh user_id disini, jika ingin membuat userId baru, kosongkan saja => ''
 
         // Parameter untuk generate berdasarkan prompt
         mood: "Happy",

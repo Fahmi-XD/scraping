@@ -44,6 +44,6 @@ export function generateDeviceIdFromAndroidId(androidId) {
     return nameUUIDFromBytes(bytes);
 }
 
-const sampleAndroidId = '9774d56d682e549c'; // contoh emulator default
+const sampleAndroidId = '8d08c20553ed3cc6'; // contoh emulator default
 console.log('android_id =', sampleAndroidId);
 console.log('device id =', generateDeviceIdFromAndroidId(sampleAndroidId));

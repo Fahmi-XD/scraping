@@ -18,7 +18,7 @@ function generateDeviceId(packageName, androidId) {
 // Misalnya "android_id" atau "device".
 // Contoh sederhana:
 const namespace = uuidv3.URL; // pakai namespace default bawaan
-const androidId = "32d0c9bd5c7aa570"; // biasanya dari Settings.Secure.ANDROID_ID
+const androidId = "5f1f1dfc8ee6e6e9"; // biasanya dari Settings.Secure.ANDROID_ID
 const deviceId = uuidv3(androidId, namespace);
 
 console.log(deviceId); // hasil seperti 944b5183-6124-3887-90af-d939cf3cfa87
